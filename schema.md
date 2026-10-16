@@ -27,3 +27,15 @@ LIGNE_COMMANDE(**#id_commande**, **#id_plat**, quantite) (nouveau)
 ### Piège
 
 La quantité va dans LIGNE_COMMANDE, parce qu'elle dépend à la fois de la commande et du plat : « 2 Mi sao dans la commande 2 ». Dans PLAT elle serait la même pour toutes les commandes, et dans COMMANDE elle n'aurait pas de sens puisqu'une commande contient plusieurs plats.
+
+## Étape 4 – Les habitués
+
+CATEGORIE(**id_categorie**, libelle)
+PLAT(**id_plat**, nom, prix, #id_categorie)
+CLIENT(**id_client**, nom, telephone?) (nouveau)
+COMMANDE(**id_commande**, date_commande, #id_client?) (modifié)
+LIGNE_COMMANDE(**#id_commande**, **#id_plat**, quantite)
+
+### Piège
+
+Non, la clé étrangère `id_client` n'est pas `NOT NULL`, sinon on serait obligé de créer un client pour chaque personne de passage. Pour ne perdre aucune commande il faut un `LEFT JOIN` de COMMANDE vers CLIENT : avec un `JOIN` simple, les commandes sans client disparaîtraient du résultat.
