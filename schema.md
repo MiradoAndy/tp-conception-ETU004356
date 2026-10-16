@@ -71,3 +71,24 @@ PAIEMENT(**id_paiement**, #id_commande, #id_mode, montant, date_paiement, refere
 Une colonne `montant_paye` dans COMMANDE ne garde que le total : on ne sait plus qui a payé quoi, ni par quel moyen, ni quand, ni avec quelle référence, et on ne peut pas mettre deux modes sur la même commande. Il faut une ligne par paiement.
 
 Pour le mode de paiement, un `CHECK (mode IN ('Espèces','MVola',...))` est simple et évite une jointure, mais ajouter un opérateur (ou renommer « Orange Money ») oblige à modifier la contrainte, et on ne peut pas y attacher d'information. Une table de référence demande une jointure en plus, mais on ajoute un mode par un simple `INSERT`, la clé étrangère garantit les valeurs, et on peut porter des attributs comme `mobile_money`. J'ai choisi la table de référence. Limite : la référence de transaction reste facultative dans PAIEMENT, car une contrainte ne peut pas la rendre obligatoire seulement pour le mobile money sans trigger.
+
+## Étape 7 – Les prix changent
+
+CATEGORIE(**id_categorie**, libelle)
+PLAT(**id_plat**, nom, prix, #id_categorie)  (`prix` = prix actuel)
+CLIENT(**id_client**, nom, telephone?)
+SERVEUR(**id_serveur**, nom)
+TABLE_SALLE(**id_table**, numero)
+COMMANDE(**id_commande**, date_commande, #id_client?, #id_serveur, #id_table?)
+LIGNE_COMMANDE(**#id_commande**, **#id_plat**, quantite, prix_unitaire) (modifié)
+MODE_PAIEMENT(**id_mode**, libelle, mobile_money)
+PAIEMENT(**id_paiement**, #id_commande, #id_mode, montant, date_paiement, reference?)
+PRIX_PLAT(**#id_plat**, **date_debut**, prix) (nouveau, bonus)
+
+### Constat
+
+Après l'augmentation, la requête de l'étape 3 donne 15 500 Ar au lieu de 15 000 Ar pour la commande 1 : le romazava vaut maintenant 7 500 Ar et la requête va chercher le prix dans PLAT. Une ancienne facture a donc changé, alors que le client l'a déjà payée 15 000 Ar.
+
+### Correction
+
+Le prix payé est recopié dans `LIGNE_COMMANDE.prix_unitaire` au moment de la commande, et les montants se calculent avec cette colonne et plus avec `PLAT.prix`. Il fallait remplir cette colonne avant de modifier le prix du romazava. La table PRIX_PLAT (bonus) garde tous les prix d'un plat avec leur date de début ; `PLAT.prix` reste le prix actuel pour saisir rapidement les nouvelles commandes.
