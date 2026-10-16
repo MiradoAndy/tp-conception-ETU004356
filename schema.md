@@ -39,3 +39,17 @@ LIGNE_COMMANDE(**#id_commande**, **#id_plat**, quantite)
 ### Piège
 
 Non, la clé étrangère `id_client` n'est pas `NOT NULL`, sinon on serait obligé de créer un client pour chaque personne de passage. Pour ne perdre aucune commande il faut un `LEFT JOIN` de COMMANDE vers CLIENT : avec un `JOIN` simple, les commandes sans client disparaîtraient du résultat.
+
+## Étape 5 – Serveurs et tables
+
+CATEGORIE(**id_categorie**, libelle)
+PLAT(**id_plat**, nom, prix, #id_categorie)
+CLIENT(**id_client**, nom, telephone?)
+SERVEUR(**id_serveur**, nom) (nouveau)
+TABLE_SALLE(**id_table**, numero) (nouveau)
+COMMANDE(**id_commande**, date_commande, #id_client?, #id_serveur, #id_table?) (modifié)
+LIGNE_COMMANDE(**#id_commande**, **#id_plat**, quantite)
+
+### Piège
+
+Une table de la salle est un objet physique qui existe en permanence (il y en a 8) et qui sert à plusieurs commandes au fil des jours, alors qu'une commande est un événement daté qui peut même ne pas avoir de table (à emporter). Ce sont donc deux entités distinctes reliées par une clé étrangère facultative. Le mot `table` est un mot réservé du SQL (`CREATE TABLE`), donc l'utiliser comme nom de table provoque une erreur de syntaxe : j'ai nommé la mienne `table_salle`.
