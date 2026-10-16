@@ -16,3 +16,14 @@ PLAT(**id_plat**, nom, prix, #id_categorie) (modifié)
 ### Piège
 
 Avec une colonne `categorie VARCHAR(50)` dans PLAT, on peut écrire « Soupe » pour un plat et « soupe » ou « Soupes » pour un autre : le même groupe est alors coupé en deux dans les statistiques. On ne peut pas non plus avoir une catégorie sans plat, ni la renommer sans modifier toutes les lignes. Avec une table CATEGORIE, le libellé est écrit une seule fois et la clé étrangère empêche les valeurs inventées.
+
+## Étape 3 – Les commandes
+
+CATEGORIE(**id_categorie**, libelle)
+PLAT(**id_plat**, nom, prix, #id_categorie)
+COMMANDE(**id_commande**, date_commande) (nouveau)
+LIGNE_COMMANDE(**#id_commande**, **#id_plat**, quantite) (nouveau)
+
+### Piège
+
+La quantité va dans LIGNE_COMMANDE, parce qu'elle dépend à la fois de la commande et du plat : « 2 Mi sao dans la commande 2 ». Dans PLAT elle serait la même pour toutes les commandes, et dans COMMANDE elle n'aurait pas de sens puisqu'une commande contient plusieurs plats.
